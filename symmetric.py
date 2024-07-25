@@ -157,3 +157,58 @@ def apply_isometry(isometry, point, broadcast="pairwise"):
         result = left @ right
 
     return SymmetricPoint(result)
+
+def riemannian_distance(p1, p2, broadcast="pairwise"):
+    """Compute Riemannian distance between a pair of points.
+
+    Parameters
+    ----------
+    p1, p2 : SymmetricPoint
+        Points to compute distances between
+
+    broadcast : {"pairwise", "elementwise", "pairwise_reversed"} Rule
+        for computing distances between arrays of points; see the
+        docstring for apply_isometry.
+
+    """
+    g = p1.to_origin()
+
+    g_translate = apply_isometry(g, p2, broadcast=broadcast)
+
+    singular_values, _ = np.linalg.eigh(g_translate)
+    vector_valued_dist = np.log(np.abs(singular_values))
+    return np.linalg.norm(vector_valued_dist, axis=-1)
+
+def zeta_angle_from_origin(p1, p2, zeta, broadcast="pairwise"):
+    """Compute 'zeta-angles' at the origin distance between a pair of points.
+
+    Whenever p is a regular point, and zeta is a regular tangent
+    vector at the origin, there is a unique tangent vector at o of the
+    form z_p = k_p * zeta, that is contained in a Weyl sector based at
+    the origin and containing p. When p1, p2 are regular points in the
+    symmetric space, this function computes the angle between the
+    tangent vectors z_p1 and z_p2.
+
+    Parameters
+    ----------
+    p1, p2 : SymmetricPoint
+        Points to compute zeta-angles for.
+
+    zeta : ndarray
+        diagonal matrix with entries summing to zero, specifying a
+        direction in the (standard) Cartan subalgebra of SL(n, R)
+
+    broadcast : {"pairwise", "elementwise", "pairwise_reversed"} Rule
+        for computing zeta-angles between arrays of points; see the
+        docstring for apply_isometry.
+
+    """
+    zeta_trace = np.trace(zeta @ zeta)
+
+    p1_zeta = p1.k @ zeta @ np.swapaxes(p1.k, -1, -2)
+    p2_zeta = p2.k @ zeta @ np.swapaxes(p2.k, -1, -2)
+
+    product = utils.matrix_product(p1_zeta, p2_zeta,
+                                   broadcast=broadcast)
+
+    return np.trace(product, axis1=-1, axis2=-2) / zeta_trace
