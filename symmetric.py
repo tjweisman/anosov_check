@@ -7,6 +7,10 @@ separately.
 
 """
 
+import numpy as np
+
+from geometry_tools import utils
+
 class SymmetricPoint:
     """Class to represent a point in the symmetric space SO(n,R) / SO(n).
     """
