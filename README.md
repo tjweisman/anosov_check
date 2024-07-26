@@ -14,15 +14,17 @@ The main prequisite for running this code is the [geometry_tools](https://public
 
 2. (Optional.) Create a new virtual environment using e.g. [venv](https://docs.python.org/3/library/venv.html). 
 
-3. From a terminal, activate your new virtual environment (if you created one), and navigate to the root directory of the repository and run `pip install .`
+3. From a terminal, activate your new virtual environment (if you created one), and run `pip install .` from the directory where you downloaded the repository. If you do not have a working `pip` you can run `python setup.py install` instead, but **this is not recommended.**
 
 Once you have installed geometry_tools, you should also download the files in the anosov_check repository (if you haven't already). Either run `git clone https://github.com/tjweisman/anosov_check.git` or download and extract everything via the "Code" link.
 
 ## Running the algorithm
 
-If you have [Jupyter](https://jupyter.org/) installed, you can run the anosov_check.ipynb notebook. Alternatively you can run the script `anosov_check.py` by running `python anosov_check.py` from the directory where you downloaded the files.
+If you have [Jupyter](https://jupyter.org/) installed, you can run the `anosov_check.ipynb` notebook. Alternatively you can run the script `anosov_check.py` by running `python anosov_check.py` from the directory where you downloaded the files.
 
-Both the Jupyter notbook and the script perform the straight-and-spaced check on a fixed Hitchin representation of a surface group in SL(3,R) (in fact, it is a representation in the Fuchsian locus), by iterating through all geodesic words of length 10 in the group (with respect to a fixed presentation). On my personal laptop, the check takes approximately 20 minutes to run.
+Both the Jupyter notbook and the script perform the straight-and-spaced check on a fixed Hitchin representation of a surface group in SL(3,R) (in fact, it is a representation in the Fuchsian locus), by iterating through all geodesic words of length 10 in the group (with respect to a fixed presentation).
+
+On my personal laptop, the check takes approximately 20 minutes to run.
 
 ## Caveats
 
@@ -32,7 +34,7 @@ At a later date I may re-implement the algorithm using tools which support bette
 
 ## (Some) implementation details
 
-At its core, running the straight-and-spaced algorithm is just a matter of iterating through every word of some fixed length N in a surface group, and performing some angle/distance estimates for each word. Since the group in question has exponential growth, doing this naively is slow. The implementation of the algorithm in this repository takes heavy advantage of a *finite-state automaton* which accepts a unique geodesic word for each element of the surface group. The automaton itself was produced by the [kbmag](https://gap-packages.github.io/kbmag/) [HT23] program.
+At its core, running the straight-and-spaced algorithm is just a matter of iterating through every word of some fixed length N in a surface group, and performing some angle/distance estimates for each word. Since the group in question has exponential growth, doing this naively is slow. The implementation of the algorithm in this repository takes heavy advantage of a *finite-state automaton* which accepts a unique geodesic word for each element of the surface group. The automaton itself was produced by the [kbmag](https://gap-packages.github.io/kbmag/) program [HT23].
 
 Part of the reason the automaton gives a significant speedup is that the operations performed on each word w of length N can be (very roughly) described as follows:
 1. Split up w into a prefix w+ and a postfix w-, each of length N/2.
