@@ -55,6 +55,10 @@ class SymmetricPoint:
         if matrix is None:
             self._compute_matrix(a, k)
 
+    @property
+    def shape(self):
+        return self.matrix.shape[:-2]
+
     def _compute_matrix(self, a, k):
         # compute symmetric matrix from diagonal and orthogonal matrix
         self.matrix = (k @ utils.construct_diagonal(a) @
@@ -85,6 +89,9 @@ class SymmetricPoint:
            point and the "origin"
         """
         return SymmetricPoint(a=np.sqrt(self.a), k=self.k)
+
+    def vector_dist_to_origin(self):
+        return np.log(np.abs(self.a))
 
     def distance_to_origin(self):
         """Compute the distance from this point to the "origin"
@@ -180,18 +187,28 @@ def riemannian_distance(p1, p2, broadcast="pairwise"):
     g_translate = apply_isometry(g, p2, broadcast=broadcast)
 
     singular_values, _ = np.linalg.eigh(g_translate)
-    vector_valued_dist = np.log(np.abs(singular_values))
-    return np.linalg.norm(vector_valued_dist, axis=-1)
+    vvd = vector_valued_distance(p1, p2, broadcast=broadcast)
+    return np.linalg.norm(vvd, axis=-1)
 
-def zeta_angle_from_origin(p1, p2, zeta, broadcast="pairwise"):
-    """Compute 'zeta-angles' at the origin distance between a pair of points.
+def vector_valued_dist(p1, p2, broadcast="pairwise"):
+    g = p1.to_origin()
+
+    g_translate = apply_isometry(g, p2, broadcast=broadcast)
+
+    singular_values, _ = np.linalg.eigh(g_translate)
+    return np.log(np.abs(singular_values))
+
+
+def cos_zeta_angle_from_origin(p1, p2, zeta, broadcast="pairwise"):
+    """Compute cosines of 'zeta-angles' at the origin distance between a
+    pair of points.
 
     Whenever p is a regular point, and zeta is a regular tangent
     vector at the origin, there is a unique tangent vector at o of the
     form z_p = k_p * zeta, that is contained in a Weyl sector based at
     the origin and containing p. When p1, p2 are regular points in the
-    symmetric space, this function computes the angle between the
-    tangent vectors z_p1 and z_p2.
+    symmetric space, this function computes the cosine of the angle
+    between the tangent vectors z_p1 and z_p2.
 
     Parameters
     ----------
