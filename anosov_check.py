@@ -56,7 +56,7 @@ post_memos = {}
 # initial worst angles/spacing
 worst_cos_z_angle = 1.0
 worst_cos_iz_angle = 1.0
-worst_dist = 1e20 # this should be ~infinity
+worst_root_dist = 1e20 # this should be ~infinity
 
 starttime = time.time()
 
@@ -119,13 +119,15 @@ for vertex in automaton.vertices():
                                                  broadcast="pairwise_reversed")
 
             # compute distances and zeta-angles
-            dists = m1_inv_m2.distance_to_origin()
+            vector_valued_dists = m1_inv_m2.vector_dist_to_origin()
+            root_dist = (vector_valued_dists[..., 0] - vector_valued_dists[..., 1]) / 2
+
             cos_z_angle = symmetric.cos_zeta_angle_from_origin(m2_inv, m2_inv_m1, zeta,
                                              broadcast="elementwise")
             cos_iz_angle = symmetric.cos_zeta_angle_from_origin(m1_inv, m1_inv_m2, i_zeta,
                                                   broadcast="elementwise")
 
-            worst_dist = min(worst_dist, np.min(dists))
+            worst_root_dist = min(worst_root_dist, np.min(root_dist))
             worst_cos_z_angle = min(worst_cos_z_angle, np.min(cos_z_angle))
             worst_cos_iz_angle = min(worst_cos_iz_angle, np.min(cos_iz_angle))
 
@@ -135,9 +137,8 @@ for vertex in automaton.vertices():
                     i * m_segments + j + 1, n_segments * m_segments,
                     len(prefix_elts) * len(postfix_elts)
             ))
-
 timedelta = time.time() - starttime
 print(f"Complete, time was {timedelta} seconds.")
-print(f"Worst spacing: {worst_dist}")
+print(f"Worst spacing: {worst_root_dist}")
 print(f"Worst cos_z_angle: {worst_cos_z_angle}")
 print(f"Worst cos_iz_angle: {worst_cos_iz_angle}")

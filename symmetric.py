@@ -90,13 +90,30 @@ class SymmetricPoint:
         """
         return SymmetricPoint(a=np.sqrt(self.a), k=self.k)
 
-    def vector_dist_to_origin(self):
-        return np.log(np.abs(self.a))
+    def vector_dist_to_origin(self, in_standard_chamber=True):
+        """Get the vector-valued (i.e. Weyl chamber-valued) distance between
+        this point and the origin.
+
+        Parameters
+        ----------
+        in_standard_chamber: bool
+            If True (the default), return the vector so that lies in
+            the standard Weyl chamber for the standard Cartan
+            subalgebra, i.e. so that its entries are arranged in
+            nonincreasing order.
+        """
+        entries = np.log(np.abs(self.a))
+        if not in_standard_chamber:
+            return entries
+
+        entries.sort(axis=-1)
+        return np.flip(entries, axis=-1)
 
     def distance_to_origin(self):
         """Compute the distance from this point to the "origin"
         """
-        return np.linalg.norm(np.log(np.abs(self.a)), axis=-1)
+        vvd = self.vector_dist_to_origin(in_standard_chamber=False)
+        return np.linalg.norm(vvd, axis=-1)
 
     def invert_by_transvection(self):
         """Compute an "opposite" point on the other side of the "origin."
@@ -187,16 +204,45 @@ def riemannian_distance(p1, p2, broadcast="pairwise"):
     g_translate = apply_isometry(g, p2, broadcast=broadcast)
 
     singular_values, _ = np.linalg.eigh(g_translate)
-    vvd = vector_valued_distance(p1, p2, broadcast=broadcast)
+    vvd = vector_valued_distance(p1, p2, in_standard_chamber=False,
+                                 broadcast=broadcast)
     return np.linalg.norm(vvd, axis=-1)
 
-def vector_valued_dist(p1, p2, broadcast="pairwise"):
+def vector_valued_dist(p1, p2, in_standard_chamber=True,
+                       broadcast="pairwise"):
+
+    """Get the vector-valued (i.e. Weyl chamber-valued) distance between a
+    pair of points.
+
+    Parameters
+    ----------
+
+    p1, p2: SymmetricPoint
+        Points to compute vector-valued distance between
+
+    in_standard_chamber: bool
+        If True (the default), return the vector so that lies in the
+        standard Weyl chamber for the standard Cartan subalgebra,
+        i.e. so that its entries are arranged in nonincreasing order.
+
+    broadcast : {"pairwise", "elementwise", "pairwise_reversed"} Rule
+        for computing distances between arrays of points; see the
+        docstring for apply_isometry.
+
+    """
     g = p1.to_origin()
 
     g_translate = apply_isometry(g, p2, broadcast=broadcast)
 
     singular_values, _ = np.linalg.eigh(g_translate)
-    return np.log(np.abs(singular_values))
+
+    vector = np.log(np.abs(singular_values))
+
+    if not in_standard_chamber:
+        return vector
+
+    vector.sort(axis=-1)
+    return np.flip(vector)
 
 
 def cos_zeta_angle_from_origin(p1, p2, zeta, broadcast="pairwise"):
