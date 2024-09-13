@@ -1,6 +1,6 @@
 # Checking the straight-and-spaced condition for Anosov representations
 
-This repository provides an example implementation of an algorithm for checking if a representation of a surface group in SL(n, R) is Anosov, described by [Max Riestenberg](https://sites.google.com/view/max-riestenberg/) in [arXiv link here].
+This repository provides an example implementation of an algorithm for checking if a representation of a surface group in SL(n, R) is Anosov, described by [Max Riestenberg](https://sites.google.com/view/max-riestenberg/) in [[R](https://arxiv.org/abs/2409.08015)].
 
 This code has been tested on Linux machines, and the instructions below assume that you are working in a Unix-like environment. Contact [Teddy Weisman](https://public.websites.umich.edu/~tjwei/) at [tjwei@umich.edu](mailto:tjwei@umich.edu) if you need assistance.
 
@@ -59,4 +59,5 @@ Code by Teddy Weisman, based on an initial implementation by Max Riestenberg
 [HT23] Holt, D. and GAP Team, T., kbmag, Knuth-Bendix on Monoids and Automatic Groups, Version 1.5.11 (2023)<br />
 (Refereed GAP package), https://gap-packages.github.io/kbmag. 
 
-[R] Riestenberg, J. [CITATION INFO GOES HERE]
+[R] Riestenberg, J. M., Certifying Anosov representations, (2024)<br />
+arXiv preprint, https://arxiv.org/abs/2409.08015.
